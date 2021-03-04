@@ -10,6 +10,7 @@ from geometry_msgs.msg import Twist
 import math
 import numpy as np
 from threading import Thread
+from image_tools import ImageTools
 
 GYM_DICT={
     'car':{
@@ -27,7 +28,7 @@ GYM_DICT={
 
   'local_connection':{
     'scene_name': 'warren', # roboracingleague_1 | generated_track | generated_road | warehouse | sparkfun_avc | waveshare
-    'host': '127.0.0.1', # Use "127.0.0.1" for simulator running on local host.
+    'host': '192.168.0.23', # Use "127.0.0.1" for simulator running on local host.
     'port': 9091,
     'artificial_latency': 0}, # Ping the remote simulator whose latency you would like to match with, and put the ping in millisecond here.
 
@@ -50,6 +51,7 @@ class Wrapper:
         self.lidar_pub = rospy.Publisher('/lidar', LaserScan, queue_size=10)
         self.image_pub = rospy.Publisher('/image', Image, queue_size=10)
         self.twist_pub = rospy.Publisher('/twist', Twist, queue_size=10)
+        self.ImgT = ImageTools()
         #self.max_steering = self.load_param("~max_steering") # create a launch file
         self.last_speed = 0
 
@@ -58,6 +60,7 @@ class Wrapper:
         throttle = int(drive.drive.speed > self.last_speed)
         twist_msg = Twist()
         self.img, self.twist_msg.linear.x, self.twist_msg.linear.y, self.twist_msg.linear.z, self.last_speed, _, self.laser_msg = self.gym.step((steering, throttle, breaking, reset))
+        Image = self.ImgT.convert_cv2_to_ros_msg(self.img)
         #print(lidar)
 
     def pub(self):
@@ -65,13 +68,12 @@ class Wrapper:
             if self.lidar_pub is not None:
                 self.lidar_pub.publish()
             if self.image_pub is not None:
-                self.image_pub.publish()
+                self.image_pub.publish(Image)
             if self.twist_pub is not None:
                 self.twist_pub.publish()
 
 
 def main():
-    
     rospy.init_node("Wrapper_node", anonymous=True)
     # drive = rospy.Publisher("/drive", AckermannDriveStamped, queue_size=10)
     # a = AckermannDriveStamped()
