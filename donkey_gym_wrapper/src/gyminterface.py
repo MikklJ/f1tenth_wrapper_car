@@ -72,7 +72,7 @@ GYM_DICT={
   # default_connection: 'remote'
 
   'local_connection':{
-    'scene_name': 'warren', # roboracingleague_1 | generated_track | generated_road | warehouse | sparkfun_avc | waveshare
+    'scene_name': 'generated_track', # roboracingleague_1 | generated_track | generated_road | warehouse | sparkfun_avc | waveshare
     'host': '127.0.0.1', # Use "127.0.0.1" for simulator running on local host.
     'port': 9091,
     'artificial_latency': 0}, # Ping the remote simulator whose latency you would like to match with, and put the ping in millisecond here.
@@ -92,7 +92,7 @@ GYM_DICT={
 
 class GymInterface(Component, SDClient):
     '''Talking to the donkey gym'''
-    def __init__(self, poll_socket_sleep_time=0.01, gym_config = GYM_DICT):
+    def __init__(self, poll_socket_sleep_time=0.01, gym_config = DEFAULT_GYM_CONFIG):
         self.gym_config = DEFAULT_GYM_CONFIG
         connection_config = gym_config['local_connection'] if gym_config['default_connection'] == 'local' else gym_config['remote_connection']
         self.gym_config.update(gym_config['car'])
